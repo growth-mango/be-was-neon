@@ -2,6 +2,7 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
+import java.nio.file.Files;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,8 +19,7 @@ public class RequestHandler implements Runnable {
     public void run() {
         logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
                 connection.getPort());
-
-//        InputStream => InputStreamReader =>BufferedReader
+//        InputStream => InputStreamReader => BufferedReader
 //        BufferedReader.readLine() 메소드 활용해 라인별로 http header 읽는다.
         // InputStream을 BufferedReader 로 바꿔주는 API를 확인한다?
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
@@ -32,10 +32,11 @@ public class RequestHandler implements Runnable {
                 line = br.readLine();
                 logger.debug("header : {}", line);
             }
-
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = "<h1>Hello World</h1>".getBytes();
+            // 예시 코드 : byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
+//            byte[] body = "<h1>Hello World</h1>".getBytes();
+            byte[] body = Files.readAllBytes(new File("./src/main/resources/static/index.html").toPath());
             response200Header(dos, body.length);
             responseBody(dos, body);
         } catch (IOException e) {
@@ -46,6 +47,8 @@ public class RequestHandler implements Runnable {
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
+            // 텍스트만 잘 나오게 처리가 되어 있음 -> img 도 나오게 처리 해줘야함
+            // local host만 띄웠을 때, dafault로 index.html이 뜨게끔 처리를 해줘야 한다
             dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
