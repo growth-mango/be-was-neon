@@ -7,36 +7,51 @@ import java.nio.file.Files;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class RequestHandler implements Runnable {
-    private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
+// 이 서버는 클라이언트의 요청을 받아 처리하고,
+// index.html 파일의 내용을 클라이언트에게 응답으로 보내는 역할을 한다.
+public class RequestHandler implements Runnable { // ❓Runnable 인터페이스를 구현하여, 쓰레드에서 실행될 수 있도록 한다.
+    private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class); // logger 는 로그 메시지를 출력하기 위해 사용된다.
 
-    private Socket connection;
+    private Socket connection; // 클라이언트와의 네트워크 연결을 나타낸다.
 
-    public RequestHandler(Socket connectionSocket) {
+    public RequestHandler(Socket connectionSocket) { // 소켓 타입의 인자를 받아 connection 필드에 저장
         this.connection = connectionSocket;
     }
 
-    public void run() {
+    public void run() { // Runnable 인터페이스를 구현한 것!
+        // 클라이언트 연결 정보 로깅 : 클라이언트가 연결되면, IP 주소와 포트 번호를 로깅한다.
         logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
                 connection.getPort());
-//        InputStream => InputStreamReader => BufferedReader
-//        BufferedReader.readLine() 메소드 활용해 라인별로 http header 읽는다.
-        // InputStream을 BufferedReader 로 바꿔주는 API를 확인한다?
+        // 입출력 스트림 준비 : 클라이언트와의 데이터 교환을 위해 입력 스트림과 출력 스트림을 준비한다.
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
+            // 클라이언트로부터 HTTP 요청을 한 줄씩 읽어들인다.
+            // 첫 번째 줄은 요청 라인을 포함하고, 그 다음 줄들은 요청 헤더를 포함한다.
+            // 일반적으로 헤더는 라인 단위로 구성된다. 라인 단위로 데이터를 읽기 위해 BufferedReader 로 변경
             BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
-            String line = br.readLine(); // 첫 번재 라인에 해당하는 이 부분에서 index.html을 읽은 다음에 추출 -> src/main/resources/static 디렉토리에 있는 Hello World 대신 응답으로 쏴주면
-            logger.debug("request line : {}", line);
-            System.out.println("request : " + line); // 한 줄만 출력됨
-            // 요청에 대한 모든 라인(데이터)을 찍어보려면? while 문 돌면서 찍어본다
-            while (!line.equals("")){ // 공백문자열을 만나기 전 까지 , 공백문자열 만나면 while 문 빠져나감
-                line = br.readLine();
-                logger.debug("header : {}", line);
+            String line = br.readLine(); // 첫 번째 라인에 해당하는 이 부분에서 index.html을 읽은 다음에 추출 -> src/main/resources/static 디렉토리에 있는 Hello World 대신 응답으로 쏴주면
+            if(line == null){ // null 처리, null인 경우 무시한다.
+                return;
             }
+            // 첫 번째 라인, 스페이스 기반으로 스플릿
+            String[] splited = line.split(" ");
+            String path = splited[1];
+            logger.debug("request path : {}", path);
+//            logger.debug("request line : {}", line);
+//            System.out.println("request : " + line); // 한 줄만 출력됨
+            // 정상적으로 로깅이 되는지 확인해보기 위한 코드
+//            while (!line.equals("")){ // 공백문자열을 만나기 전 까지 , 공백문자열 만나면 while 문 빠져나감
+//                logger.debug("header : {}", line);
+//                line = br.readLine();
+//            }
+
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
+            // 응답 데이터 준비 : index.html 파일을 읽어들여 클라이언트에게 보낼 데이터로 준비한다.
             DataOutputStream dos = new DataOutputStream(out);
-            // 예시 코드 : byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
-//            byte[] body = "<h1>Hello World</h1>".getBytes();
-            byte[] body = Files.readAllBytes(new File("./src/main/resources/static/index.html").toPath());
+            String filePath = "./src/main/resources/static/index.html" + path;
+            File file = new File(filePath);
+            byte[] body = Files.readAllBytes(file.toPath());
+            // HTTP 응답 보내기 : 클라이언트에게 HTTP 상태 코드 200 OK 를 포함한 응답 헤더를 보내고
+            // 준비된 데이터를 응답 본문으로 보낸다
             response200Header(dos, body.length);
             responseBody(dos, body);
         } catch (IOException e) {
@@ -44,12 +59,14 @@ public class RequestHandler implements Runnable {
         }
     }
 
+    // HTTP 응답 헤더를 클라이언트에게 보낸다
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
             // 텍스트만 잘 나오게 처리가 되어 있음 -> img 도 나오게 처리 해줘야함
             // local host만 띄웠을 때, dafault로 index.html이 뜨게끔 처리를 해줘야 한다
             dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+//            dos.writeBytes("Content-Type: " + getContentType(fileName) + ";charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
@@ -57,6 +74,24 @@ public class RequestHandler implements Runnable {
         }
     }
 
+//    private String getContentType(String fileName) {
+//        if (fileName.endsWith(".html")) {
+//            return "text/html";
+//        } else if (fileName.endsWith(".css")) {
+//            return "text/css";
+//        } else if (fileName.endsWith(".js")) {
+//            return "application/javascript";
+//        } else if (fileName.endsWith(".png")) {
+//            return "image/png";
+//        } else if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg")) {
+//            return "image/jpeg";
+//        } else if (fileName.endsWith(".svg")) {
+//            return "image/svg+xml";
+//        }
+//        return "application/octet-stream";
+//    }
+
+    // index.html 을 클라이언트에게 보낸다.
     private void responseBody(DataOutputStream dos, byte[] body) {
         try {
             dos.write(body, 0, body.length);
