@@ -6,6 +6,7 @@ import java.nio.file.Files;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.HttpRequestUtils;
 
 // 이 서버는 클라이언트의 요청을 받아 처리하고,
 // index.html 파일의 내용을 클라이언트에게 응답으로 보내는 역할을 한다.
@@ -32,15 +33,12 @@ public class RequestHandler implements Runnable { // ❓Runnable 인터페이스
             if(line == null){ // null 처리, null인 경우 무시한다.
                 return;
             }
-            // 첫 번째 라인, 스페이스 기반으로 스플릿
-            String[] splited = line.split(" ");
-            String path = splited[1];
-            logger.debug("request path : {}", path);
 
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             // 응답 데이터 준비 : index.html 파일을 읽어들여 클라이언트에게 보낼 데이터로 준비한다.
+            String url = HttpRequestUtils.getUrl(line);
             DataOutputStream dos = new DataOutputStream(out);
-            String filePath = "./src/main/resources/static/index.html" + path;
+            String filePath = "./src/main/resources/static/index.html" + url;
             File file = new File(filePath);
             byte[] body = Files.readAllBytes(file.toPath());
             // HTTP 응답 보내기 : 클라이언트에게 HTTP 상태 코드 200 OK 를 포함한 응답 헤더를 보내고
