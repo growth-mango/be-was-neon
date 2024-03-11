@@ -25,8 +25,8 @@ public class WebServer {
             // 클라이언트가 연결될때까지 대기한다.
             Socket connection;
             while ((connection = listenSocket.accept()) != null) {
-                Thread thread = new Thread(new RequestHandler(connection));
-                thread.start();
+                Thread thread = new Thread(new RequestHandler(connection)); // RequestHandler에서 구현이 되고 있다.
+                thread.start(); // RequestHandler의 start 메서드를 실행하면, run 메서드가 실행되면서 HelloWorld가 출력된다
             }
         }
     }

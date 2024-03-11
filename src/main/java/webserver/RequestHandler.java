@@ -1,9 +1,6 @@
 package webserver;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.Socket;
 
 import org.slf4j.Logger;
@@ -22,7 +19,12 @@ public class RequestHandler implements Runnable {
         logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
                 connection.getPort());
 
+//        InputStream => InputStreamReader =>BufferedReader
+//        BufferedReader.readLine() 메소드 활용해 라인별로 http header 읽는다.
+        // InputStream을 BufferedReader 로 바꿔주는 API를 확인한다?
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
+            BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+            System.out.println("request : " + br.readLine());
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             DataOutputStream dos = new DataOutputStream(out);
             byte[] body = "<h1>Hello World</h1>".getBytes();
