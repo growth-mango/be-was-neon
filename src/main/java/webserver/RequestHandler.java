@@ -36,13 +36,6 @@ public class RequestHandler implements Runnable { // ❓Runnable 인터페이스
             String[] splited = line.split(" ");
             String path = splited[1];
             logger.debug("request path : {}", path);
-//            logger.debug("request line : {}", line);
-//            System.out.println("request : " + line); // 한 줄만 출력됨
-            // 정상적으로 로깅이 되는지 확인해보기 위한 코드
-//            while (!line.equals("")){ // 공백문자열을 만나기 전 까지 , 공백문자열 만나면 while 문 빠져나감
-//                logger.debug("header : {}", line);
-//                line = br.readLine();
-//            }
 
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             // 응답 데이터 준비 : index.html 파일을 읽어들여 클라이언트에게 보낼 데이터로 준비한다.
@@ -73,23 +66,6 @@ public class RequestHandler implements Runnable { // ❓Runnable 인터페이스
             logger.error(e.getMessage());
         }
     }
-
-//    private String getContentType(String fileName) {
-//        if (fileName.endsWith(".html")) {
-//            return "text/html";
-//        } else if (fileName.endsWith(".css")) {
-//            return "text/css";
-//        } else if (fileName.endsWith(".js")) {
-//            return "application/javascript";
-//        } else if (fileName.endsWith(".png")) {
-//            return "image/png";
-//        } else if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg")) {
-//            return "image/jpeg";
-//        } else if (fileName.endsWith(".svg")) {
-//            return "image/svg+xml";
-//        }
-//        return "application/octet-stream";
-//    }
 
     // index.html 을 클라이언트에게 보낸다.
     private void responseBody(DataOutputStream dos, byte[] body) {
