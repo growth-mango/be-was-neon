@@ -24,7 +24,7 @@ public class WebServer {
         // 서버소켓을 생성한다. 웹서버는 기본적으로 8080번 포트를 사용한다.
         try (ServerSocket listenSocket = new ServerSocket(port)) {
             logger.info("Web Application Server started {} port.", port);
-            Executor executor = Executors.newFixedThreadPool(50); // 50개의 스레드를 관리할 수 있는 스레드 풀 생성한다. -> 이 갯수가 적당한지는 모르겠음...
+            Executor executor = Executors.newFixedThreadPool(10); // 50개의 스레드를 관리할 수 있는 스레드 풀 생성한다. -> 이 갯수가 적당한지는 모르겠음...
 
             while (true) {
                 Socket connection = listenSocket.accept();

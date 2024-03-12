@@ -37,10 +37,9 @@ public class RequestHandler implements Runnable {
                 logger.debug("Header : {}", line);
                 line = br.readLine();
             }
-
+            // 헤더 정보 담아두는 작업 필요함
             String filePath = DEFAULT_PATH + url;
-            File file = new File(filePath);
-            byte[] body = Files.readAllBytes(file.toPath());
+            byte[] body = getHtml(filePath).getBytes();
 
             DataOutputStream dos = new DataOutputStream(out);
             response200Header(dos, body.length);
@@ -48,6 +47,19 @@ public class RequestHandler implements Runnable {
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
+    }
+
+    private String getHtml(String path) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        try(BufferedReader br = new BufferedReader(new FileReader(path))) {
+            String currentLine;
+            while ((currentLine = br.readLine()) != null) {
+                sb.append(currentLine);
+            }
+        }catch (IOException e){
+            throw new IOException("file not found : " + path);
+        }
+        return sb.toString();
     }
 
     // HTTP 응답 헤더를 클라이언트에게 보낸다
