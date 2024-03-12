@@ -6,6 +6,7 @@ import java.nio.file.Files;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.RequestUtil;
 
 public class RequestHandler implements Runnable {
     private static final String DEFAULT_PATH = "./src/main/resources/static";
@@ -29,11 +30,10 @@ public class RequestHandler implements Runnable {
 
             // 첫 번째 라인에서 요청 URL 추츨 (/index.html)
             String line = br.readLine();
-            String[] tokens = line.split(" ");
-            String url = tokens[1];
+            String url = RequestUtil.getUrl(line);
 
             // 모든 Request Header 출력
-            while (!line.equals("")){
+            while (!line.isEmpty()){
                 logger.debug("Header : {}", line);
                 line = br.readLine();
             }
