@@ -4,12 +4,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-public class RequestUtilTest {
+class RequestUtilTest {
 
     @Test
     @DisplayName("/index.html 이 추출되면 테스트가 성공한다")
-    public void testGetUrl(){
+    void testGetUrl(){
         // 실제값 , 기대값
-        assertThat("/index.html").isEqualTo(RequestParser.getUrl("GET /index.html HTTP1.1"));
+        assertThat("/index.html").isEqualTo(RequestLineParser.getUrl("GET /index.html HTTP1.1"));
     }
 }
