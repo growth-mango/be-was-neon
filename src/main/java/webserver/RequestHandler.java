@@ -2,7 +2,8 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
-import java.nio.file.Files;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,12 +33,25 @@ public class RequestHandler implements Runnable {
             String line = br.readLine();
             String url = RequestUtil.getUrl(line);
 
+            // Request Header 저장, 우선 필요한지 모르겠지만 저장하고 본다...
+            Map<String, String> headers = new HashMap<>();
             // 모든 Request Header 출력
-            while (!line.isEmpty()){
+            while ((line = br.readLine()) != null && !line.isEmpty()){ // 첫 번째 라인 (요청 라인) 은 요청의 맥락, 헤더가 아니기에 건너뛰고 시작한다.
+                int separator = line.indexOf(":");
+                if(separator != -1){
+                    String name = line.substring(0, separator).trim();
+                    String value = line.substring(separator+1).trim();
+                    headers.put(name,value);
+                }
                 logger.debug("Header : {}", line);
-                line = br.readLine();
+//                line = br.readLine();
             }
-            // 헤더 정보 담아두는 작업 필요함
+
+            // 모든 Request Header 출력
+//            for (Map.Entry<String, String> header : headers.entrySet()) {
+//                logger.debug("Header Key: \"{}\" Value: \"{}\"", header.getKey(), header.getValue());
+//            }
+
             String filePath = DEFAULT_PATH + url;
             byte[] body = getHtml(filePath).getBytes();
 
