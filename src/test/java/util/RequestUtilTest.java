@@ -10,6 +10,6 @@ public class RequestUtilTest {
     @DisplayName("/index.html 이 추출되면 테스트가 성공한다")
     public void testGetUrl(){
         // 실제값 , 기대값
-        assertThat("/index.html").isEqualTo(RequestUtil.getUrl("GET /index.html HTTP1.1"));
+        assertThat("/index.html").isEqualTo(RequestParser.getUrl("GET /index.html HTTP1.1"));
     }
 }

@@ -7,7 +7,7 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import util.RequestUtil;
+import util.RequestParser;
 
 public class RequestHandler implements Runnable {
     private static final String DEFAULT_PATH = "./src/main/resources/static";
@@ -31,7 +31,17 @@ public class RequestHandler implements Runnable {
 
             // 첫 번째 라인에서 요청 URL 추츨 (/index.html)
             String line = br.readLine();
-            String url = RequestUtil.getUrl(line);
+            String url = RequestParser.getUrl(line);
+
+            // 회원가입 폼 이동 테스트를 위한 임시 코드
+            if(url.equals("/register.html")){
+                String filePath = "./src/main/resources/static/registration/index.html";
+                byte[] body = getHtml(filePath).getBytes();
+
+                DataOutputStream dos = new DataOutputStream(out);
+                response200Header(dos, body.length);
+                responseBody(dos, body);
+            }
 
             // Request Header 저장, 우선 필요한지 모르겠지만 저장하고 본다...
             Map<String, String> headers = new HashMap<>();
