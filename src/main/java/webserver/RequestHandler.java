@@ -37,15 +37,7 @@ public class RequestHandler implements Runnable {
             // header 출력
             printHttpHeader(line, br);
 
-            // 📌 만약에 path 가 create 로 시작하면
-            if(url.startsWith("/create")) {
-                // 파싱 한 정보를 User 에 넘긴다
-                User user = new User(requestLineParser.getValue("userId"), requestLineParser.getValue("nickName"), requestLineParser.getValue("password"));
-                // 그리고 다시 index.html 로 돌아간다 -> 200 아니고 302 코드 던지기
-                response302(dos);
-                return;
-            }
-
+            // 여기서 부터는 회원 가입 로직 처리
             String filePath;
             if (url.equals(SIGN_UP_URL_PATH)) {
                 filePath = "./src/main/resources/static/registration/index.html";
@@ -53,8 +45,16 @@ public class RequestHandler implements Runnable {
                 filePath = DEFAULT_PATH + url;
             }
 
-            byte[] body = getHtml(filePath).getBytes();
+            // 📌 만약에 path 가 create 로 시작하면 (회원 가입 버튼 누르면)
+            if(url.startsWith("/create")) {
+                // 파싱 한 정보를 User 에 넘긴다
+                User user = new User(requestLineParser.getValue("userId"), requestLineParser.getValue("nickName"), requestLineParser.getValue("password"));
+                // 그리고 다시 index.html 로 돌아간다 -> 200 아니고 302 응답
+                response302(dos);
+                return;
+            }
 
+            byte[] body = getHtml(filePath).getBytes();
 
             response200Header(dos, body.length);
             responseBody(dos, body);
