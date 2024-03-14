@@ -35,7 +35,7 @@ public class RequestHandler implements Runnable {
             String url = requestLineParser.getRequestURL();
 
             // header 출력
-            printHttpHeader(line);
+            printHttpHeader(line, br);
 
             // 📌 만약에 path 가 create 로 시작하면
             if(url.startsWith("/create")) {
@@ -76,8 +76,8 @@ public class RequestHandler implements Runnable {
         return sb.toString();
     }
 
-    private void printHttpHeader(String line) {
-        while (!line.isEmpty()) { // 첫 번째 라인 (요청 라인) 은, 헤더가 아니기에 건너뛰고 시작한다.
+    private void printHttpHeader(String line, BufferedReader br) throws IOException{
+        while ((line = br.readLine()) != null && !line.isEmpty()) { // 첫 번째 라인 (요청 라인) 은, 헤더가 아니기에 건너뛰고 시작한다.
             int separator = line.indexOf(":");
             if (separator != -1) {
                 String name = line.substring(0, separator).trim();
