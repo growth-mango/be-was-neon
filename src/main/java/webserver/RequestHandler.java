@@ -18,6 +18,10 @@ public class RequestHandler implements Runnable {
     static {
         MIME_TYPES.put("html", "text/html");
         MIME_TYPES.put("css", "text/css");
+        MIME_TYPES.put("ico", "image/x-icon");
+        MIME_TYPES.put("jpg", "image/jpeg");
+        MIME_TYPES.put("js", "application/x-javascript");
+        MIME_TYPES.put("png", "img/png");
     }
 
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
