@@ -13,6 +13,12 @@ import util.RequestLineParser;
 public class RequestHandler implements Runnable {
     private static final String DEFAULT_PATH = "./src/main/resources/static";
     private static final String SIGN_UP_URL_PATH = "/register.html";
+    private static final Map<String, String> MIME_TYPES = new HashMap<>();
+
+    static {
+        MIME_TYPES.put("html", "text/html");
+        MIME_TYPES.put("css", "text/css");
+    }
 
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
     private Socket connection;
@@ -55,8 +61,8 @@ public class RequestHandler implements Runnable {
             }
 
             byte[] body = getHtml(filePath).getBytes();
-
-            response200Header(dos, body.length);
+            String contentType = getContentType(filePath);
+            response200Header(dos, body.length, contentType);
             responseBody(dos, body);
         } catch (IOException e) {
             logger.error(e.getMessage());
@@ -92,11 +98,21 @@ public class RequestHandler implements Runnable {
         }
     }
 
+    // 파일 확장자에 따라 적절한 Content-Type을 반환한다
+    private String getContentType(String filePath) {
+        int dotIndex = filePath.lastIndexOf('.');
+        if (dotIndex != -1) {
+            String extension = filePath.substring(dotIndex + 1);
+            return MIME_TYPES.getOrDefault(extension, "text/html");
+        }
+        return "text/html";
+    }
+
     // HTTP 응답 헤더를 클라이언트에게 보낸다
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
+    private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String contentType) {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+            dos.writeBytes("Content-Type: " + contentType + ";charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
