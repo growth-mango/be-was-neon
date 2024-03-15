@@ -21,7 +21,8 @@ public class RequestHandler implements Runnable {
         MIME_TYPES.put("ico", "image/x-icon");
         MIME_TYPES.put("jpg", "image/jpeg");
         MIME_TYPES.put("js", "application/x-javascript");
-        MIME_TYPES.put("png", "img/png");
+        MIME_TYPES.put("png", "image/png");
+        MIME_TYPES.put("svg", "image/svg+xml");
     }
 
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -41,6 +42,7 @@ public class RequestHandler implements Runnable {
 
             // 첫 번째 라인에서 요청 URL 추츨 (/index.html)
             String line = br.readLine();
+            logger.debug("request : {}", line);
             RequestLineParser requestLineParser = new RequestLineParser(line);
             String url = requestLineParser.getRequestURL();
 
@@ -56,7 +58,7 @@ public class RequestHandler implements Runnable {
             }
 
             // 📌 만약에 path 가 create 로 시작하면 (회원 가입 버튼 누르면)
-            if(url.startsWith("/create")) {
+            if (url.startsWith("/create")) {
                 // 파싱 한 정보를 User 에 넘긴다
                 User user = new User(requestLineParser.getValue("userId"), requestLineParser.getValue("nickName"), requestLineParser.getValue("password"));
                 // 그리고 다시 index.html 로 돌아간다 -> 200 아니고 302 응답
@@ -86,7 +88,7 @@ public class RequestHandler implements Runnable {
         return sb.toString();
     }
 
-    private void printHttpHeader(String line, BufferedReader br) throws IOException{
+    private void printHttpHeader(String line, BufferedReader br) throws IOException {
         while ((line = br.readLine()) != null && !line.isEmpty()) { // 첫 번째 라인 (요청 라인) 은, 헤더가 아니기에 건너뛰고 시작한다.
             int separator = line.indexOf(":");
             if (separator != -1) {
@@ -124,7 +126,7 @@ public class RequestHandler implements Runnable {
         }
     }
 
-    private void response302(DataOutputStream dos){
+    private void response302(DataOutputStream dos) {
         String redirectURL = "/index.html";
         try {
             dos.writeBytes("HTTP/1.1 302 FOUND\r\n");
