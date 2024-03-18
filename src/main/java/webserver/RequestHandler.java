@@ -2,10 +2,10 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.HashMap;
 import java.util.Map;
 
 import httpMessage.HttpRequest;
+import httpMessage.HttpResponse;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +37,7 @@ public class RequestHandler implements Runnable {
             String url = requestLineParser.getRequestURL();
 
             // header 출력
-            Map<String,String> headers = httpRequest.getHttpHeaders();
+            Map<String,String> headers = httpRequest.getHeaders();
             for (Map.Entry<String, String> header : headers.entrySet()){
                 logger.debug("Header Key: \"{}\" Value: \"{}\"", header.getKey(), header.getValue());
             }
@@ -45,20 +45,25 @@ public class RequestHandler implements Runnable {
             // 모든 정적 리소스를 공통된 방식으로 처리
             String filePath = DEFAULT_PATH + url;
 
+
+            HttpResponse httpResponse = new HttpResponse(dos);
+
             // 여기서 부터는 회원 가입 로직 처리
             // 📌 만약에 path 가 create 로 시작하면 (회원 가입 버튼 누르면)
             if (url.startsWith("/create")) {
                 // 파싱 한 정보를 User 에 넘긴다
                 User user = new User(requestLineParser.getValue("userId"), requestLineParser.getValue("nickName"), requestLineParser.getValue("password"));
                 // 그리고 다시 register.html 로 돌아간다 -> 200 아니고 302 응답
-                response302(dos);
+                httpResponse.response302(dos);
                 return;
             }
 
             byte[] body = getHtml(filePath).getBytes();
             String contentType = getContentType(filePath);
-            response200Header(dos, body.length, contentType);
-            responseBody(dos, body);
+
+            httpResponse.setBody(body);
+            httpResponse.response200Header(dos, body.length, contentType);
+            httpResponse.responseBody(dos, body);
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
@@ -85,39 +90,5 @@ public class RequestHandler implements Runnable {
             return ContentType.findByExtension(extension).getMimeType();
         }
         return ContentType.DEFAULT.getMimeType();
-    }
-
-    // HTTP 응답 헤더를 클라이언트에게 보낸다
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String contentType) {
-        try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: " + contentType + ";charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    private void response302(DataOutputStream dos) {
-        String redirectURL = "/index.html";
-        try {
-            dos.writeBytes("HTTP/1.1 302 FOUND\r\n");
-            dos.writeBytes("Location: " + redirectURL + "\r\n");
-            dos.writeBytes("\r\n");
-            dos.flush();
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    // register.html 을 클라이언트에게 보낸다.
-    private void responseBody(DataOutputStream dos, byte[] body) {
-        try {
-            dos.write(body, 0, body.length);
-            dos.flush();
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
     }
 }
