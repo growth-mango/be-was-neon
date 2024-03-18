@@ -1,5 +1,6 @@
 package util;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
@@ -9,7 +10,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 class RequestLineParserTest {
 
     @Test
-    void testParseRequestLineWithoutQueryParameters(){
+    @DisplayName("쿼리 파라미터가 없는 경우에 경로 추출이 잘 되는지 확인한다.")
+    void testUrlParseRequestLineWithoutQueryParameters(){
         // case
         String requestLine = "GET /user/create HTTP/1.1";
         RequestLineParser parser = new RequestLineParser(requestLine);
@@ -19,11 +21,25 @@ class RequestLineParserTest {
 
         // then
         assertThat(requestURL).isEqualTo("/user/create"); // 실제, 기대하는 값
-        assertThat(parser.getQueries().isEmpty()); // 쿼리 파라미터가 없으면 당연히 쿼리가 비어 있어야 함
     }
 
     @Test
-    void testParserRequestLineWithQueryParameters(){
+    @DisplayName("쿼리 파라미터가 있는 경우에 경로 추출이 잘 되는지 확인 한다.")
+    void testUrlParserRequestLineWithQueryParameters(){
+        // case
+        String requestLine = "GET /create?userId=javajigi&password=password&nickname=박재성 HTTP/1.1";
+        RequestLineParser parser = new RequestLineParser(requestLine);
+
+        // when
+        parser.parseQueryParameter(requestLine.split(" ")[1]);
+
+        // then
+        assertThat(parser.getRequestURL()).isEqualTo("/create");
+    }
+
+    @Test
+    @DisplayName("쿼리 파라미터가 있는 경우에 쿼리 스트링이 키 : 값 으로 잘 분류되는지 확인 한다.")
+    void testQueriesParserRequestLineWithQueryParameter(){
         // case
         String requestLine = "GET /create?userId=javajigi&password=password&nickname=박재성 HTTP/1.1";
         RequestLineParser parser = new RequestLineParser(requestLine);
@@ -33,7 +49,6 @@ class RequestLineParserTest {
         Map<String, String> queries = parser.getQueries();
 
         // then
-        assertThat(parser.getRequestURL()).isEqualTo("/create");
         assertThat(queries).containsAllEntriesOf(
                 Map.of(
                         "userId", "javajigi",
