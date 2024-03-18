@@ -36,7 +36,7 @@ public class RequestHandler implements Runnable {
         }
     }
 
-    private void  processRequest(HttpRequest httpRequest, HttpResponse httpResponse, DataOutputStream dos) throws IOException {
+    private void processRequest(HttpRequest httpRequest, HttpResponse httpResponse, DataOutputStream dos) throws IOException {
         String url = httpRequest.getRequestURL();
         if (url.startsWith("/create")) {
             processSignUp(httpRequest, httpResponse, dos);
