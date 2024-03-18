@@ -8,8 +8,8 @@ import java.util.Map;
 
 public class HttpRequest {
     private String requestLine;
-    private Map<String, String> httpHeaders = new HashMap<>();
-    private Map<String, String> httpBodies = new HashMap<>();
+    private Map<String, String> headers = new HashMap<>();
+    private Map<String, String> bodies = new HashMap<>();
 
     public HttpRequest(BufferedReader br) throws IOException {
         this.requestLine = br.readLine(); // 요청 라인 읽기
@@ -23,7 +23,7 @@ public class HttpRequest {
             if (separator != -1) {
                 String name = line.substring(0, separator).trim();
                 String value = line.substring(separator + 1).trim();
-                httpHeaders.put(name, value);
+                headers.put(name, value);
             }
         }
     }
@@ -32,11 +32,11 @@ public class HttpRequest {
         return requestLine;
     }
 
-    public Map<String, String> getHttpHeaders() {
-        return httpHeaders;
+    public Map<String, String> getHeaders() {
+        return headers;
     }
 
-    public Map<String, String> getHttpBodies() {
-        return httpBodies;
+    public Map<String, String> getBodies() {
+        return bodies;
     }
 }
