@@ -2,7 +2,6 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.Map;
 
 import httpMessage.HttpRequest;
 import httpMessage.HttpResponse;
@@ -26,21 +25,17 @@ public class RequestHandler implements Runnable {
         // 클라이언트 연결 정보 로깅 : 클라이언트가 연결되면, IP 주소와 포트 번호를 로깅한다.
         logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(), connection.getPort());
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
             DataOutputStream dos = new DataOutputStream(out);
 
             // 첫 번째 라인에서 요청 URL 추츨 (/register.html)
-            HttpRequest httpRequest = new HttpRequest(br);
+            HttpRequest httpRequest = new HttpRequest(in);
             String line = httpRequest.getRequestLine();
             logger.debug("request line : {}", line);
             RequestLineParser requestLineParser = new RequestLineParser(line);
             String url = requestLineParser.getRequestURL();
 
             // header 출력
-            Map<String,String> headers = httpRequest.getHeaders();
-            for (Map.Entry<String, String> header : headers.entrySet()){
-                logger.debug("Header Key: \"{}\" Value: \"{}\"", header.getKey(), header.getValue());
-            }
+            httpRequest.printHeaders(httpRequest.getHeaders());
 
             // 모든 정적 리소스를 공통된 방식으로 처리
             String filePath = DEFAULT_PATH + url;
@@ -67,6 +62,32 @@ public class RequestHandler implements Runnable {
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
+    }
+
+    private void  processRequest(HttpRequest httpRequest, HttpResponse httpResponse, DataOutputStream dos) throws IOException {
+        String url = httpRequest.getRequestURL();
+        if (url.startsWith("/create")) {
+            processSignUp(httpRequest, httpResponse, dos);
+        } else {
+            serveStaticResource(url, httpResponse, dos);
+        }
+    }
+
+    private void processSignUp(HttpRequest httpRequest, HttpResponse httpResponse, DataOutputStream dos) {
+        User user = new User(httpRequest.getValue("userId"), httpRequest.getValue("nickName"), httpRequest.getValue("password"));
+        // 그리고 다시 register.html 로 돌아간다 -> 200 아니고 302 응답
+        httpResponse.response302(dos);
+    }
+
+    private void serveStaticResource(String url, HttpResponse httpResponse, DataOutputStream dos) throws IOException {
+        // 모든 정적 리소스를 공통된 방식으로 처리
+        String filePath = DEFAULT_PATH + url;
+        byte[] body = getHtml(filePath).getBytes();
+        String contentType = getContentType(filePath);
+
+        httpResponse.setBody(body);
+        httpResponse.response200Header(dos, body.length, contentType);
+        httpResponse.responseBody(dos, body);
     }
 
     private String getHtml(String path) throws IOException {
