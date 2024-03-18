@@ -9,22 +9,11 @@ import httpMessage.HttpRequest;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.ContentType;
 import util.RequestLineParser;
 
 public class RequestHandler implements Runnable {
     private static final String DEFAULT_PATH = "./src/main/resources/static";
-
-    private static final Map<String, String> MIME_TYPES = new HashMap<>();
-
-    static {
-        MIME_TYPES.put("html", "text/html");
-        MIME_TYPES.put("css", "text/css");
-        MIME_TYPES.put("ico", "image/x-icon");
-        MIME_TYPES.put("jpg", "image/jpeg");
-        MIME_TYPES.put("js", "application/x-javascript");
-        MIME_TYPES.put("png", "image/png");
-        MIME_TYPES.put("svg", "image/svg+xml");
-    }
 
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
     private Socket connection;
@@ -42,7 +31,6 @@ public class RequestHandler implements Runnable {
 
             // 첫 번째 라인에서 요청 URL 추츨 (/register.html)
             HttpRequest httpRequest = new HttpRequest(br);
-//            String line = br.readLine();
             String line = httpRequest.getRequestLine();
             logger.debug("request line : {}", line);
             RequestLineParser requestLineParser = new RequestLineParser(line);
@@ -94,9 +82,9 @@ public class RequestHandler implements Runnable {
         int dotIndex = filePath.lastIndexOf('.');
         if (dotIndex != -1) {
             String extension = filePath.substring(dotIndex + 1);
-            return MIME_TYPES.getOrDefault(extension, "text/html");
+            return ContentType.findByExtension(extension).getMimeType();
         }
-        return "text/html";
+        return ContentType.DEFAULT.getMimeType();
     }
 
     // HTTP 응답 헤더를 클라이언트에게 보낸다
