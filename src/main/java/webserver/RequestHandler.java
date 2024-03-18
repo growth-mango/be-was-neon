@@ -9,7 +9,6 @@ import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.ContentType;
-import util.RequestLineParser;
 
 public class RequestHandler implements Runnable {
     private static final String DEFAULT_PATH = "./src/main/resources/static";
@@ -26,39 +25,13 @@ public class RequestHandler implements Runnable {
         logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(), connection.getPort());
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             DataOutputStream dos = new DataOutputStream(out);
-
-            // 첫 번째 라인에서 요청 URL 추츨 (/register.html)
             HttpRequest httpRequest = new HttpRequest(in);
-            String line = httpRequest.getRequestLine();
-            logger.debug("request line : {}", line);
-            RequestLineParser requestLineParser = new RequestLineParser(line);
-            String url = requestLineParser.getRequestURL();
+            HttpResponse httpResponse = new HttpResponse(dos);
 
             // header 출력
             httpRequest.printHeaders(httpRequest.getHeaders());
 
-            // 모든 정적 리소스를 공통된 방식으로 처리
-            String filePath = DEFAULT_PATH + url;
-
-
-            HttpResponse httpResponse = new HttpResponse(dos);
-
-            // 여기서 부터는 회원 가입 로직 처리
-            // 📌 만약에 path 가 create 로 시작하면 (회원 가입 버튼 누르면)
-            if (url.startsWith("/create")) {
-                // 파싱 한 정보를 User 에 넘긴다
-                User user = new User(requestLineParser.getValue("userId"), requestLineParser.getValue("nickName"), requestLineParser.getValue("password"));
-                // 그리고 다시 register.html 로 돌아간다 -> 200 아니고 302 응답
-                httpResponse.response302(dos);
-                return;
-            }
-
-            byte[] body = getHtml(filePath).getBytes();
-            String contentType = getContentType(filePath);
-
-            httpResponse.setBody(body);
-            httpResponse.response200Header(dos, body.length, contentType);
-            httpResponse.responseBody(dos, body);
+            processRequest(httpRequest, httpResponse, dos);
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
