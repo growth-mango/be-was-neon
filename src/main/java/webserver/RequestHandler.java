@@ -28,7 +28,6 @@ public class RequestHandler implements Runnable {
             HttpRequest httpRequest = new HttpRequest(in);
             HttpResponse httpResponse = new HttpResponse(dos);
 
-            // header 출력
             httpRequest.printHeaders(httpRequest.getHeaders());
 
             processRequest(httpRequest, httpResponse, dos);
@@ -53,7 +52,7 @@ public class RequestHandler implements Runnable {
     }
 
     private void serveStaticResource(String url, HttpResponse httpResponse, DataOutputStream dos) throws IOException {
-        // 모든 정적 리소스를 공통된 방식으로 처리
+        // 모든 정적 리소스를 공통된 방식으로 처리 -> static/registration/index.html -> static/register.html
         String filePath = DEFAULT_PATH + url;
         byte[] body = getHtml(filePath).getBytes();
         String contentType = getContentType(filePath);
