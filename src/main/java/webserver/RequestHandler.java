@@ -5,6 +5,7 @@ import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
 
+import httpMessage.HttpRequest;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +13,7 @@ import util.RequestLineParser;
 
 public class RequestHandler implements Runnable {
     private static final String DEFAULT_PATH = "./src/main/resources/static";
-    private static final String SIGN_UP_URL_PATH = "/register.html";
+
     private static final Map<String, String> MIME_TYPES = new HashMap<>();
 
     static {
@@ -27,7 +28,6 @@ public class RequestHandler implements Runnable {
 
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
     private Socket connection;
-    private Map<String, String> httpHeaders = new HashMap<>();
 
     public RequestHandler(Socket connectionSocket) { // 소켓 타입의 인자를 받아 connection 필드에 저장
         this.connection = connectionSocket;
@@ -40,28 +40,29 @@ public class RequestHandler implements Runnable {
             BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
             DataOutputStream dos = new DataOutputStream(out);
 
-            // 첫 번째 라인에서 요청 URL 추츨 (/index.html)
-            String line = br.readLine();
-            logger.debug("request : {}", line);
+            // 첫 번째 라인에서 요청 URL 추츨 (/register.html)
+            HttpRequest httpRequest = new HttpRequest(br);
+//            String line = br.readLine();
+            String line = httpRequest.getRequestLine();
+            logger.debug("request line : {}", line);
             RequestLineParser requestLineParser = new RequestLineParser(line);
             String url = requestLineParser.getRequestURL();
 
             // header 출력
-            printHttpHeader(line, br);
-
-            // 여기서 부터는 회원 가입 로직 처리
-            String filePath;
-            if (url.equals(SIGN_UP_URL_PATH)) {
-                filePath = "./src/main/resources/static/registration/index.html";
-            } else {
-                filePath = DEFAULT_PATH + url;
+            Map<String,String> headers = httpRequest.getHttpHeaders();
+            for (Map.Entry<String, String> header : headers.entrySet()){
+                logger.debug("Header Key: \"{}\" Value: \"{}\"", header.getKey(), header.getValue());
             }
 
+            // 모든 정적 리소스를 공통된 방식으로 처리
+            String filePath = DEFAULT_PATH + url;
+
+            // 여기서 부터는 회원 가입 로직 처리
             // 📌 만약에 path 가 create 로 시작하면 (회원 가입 버튼 누르면)
             if (url.startsWith("/create")) {
                 // 파싱 한 정보를 User 에 넘긴다
                 User user = new User(requestLineParser.getValue("userId"), requestLineParser.getValue("nickName"), requestLineParser.getValue("password"));
-                // 그리고 다시 index.html 로 돌아간다 -> 200 아니고 302 응답
+                // 그리고 다시 register.html 로 돌아간다 -> 200 아니고 302 응답
                 response302(dos);
                 return;
             }
@@ -86,22 +87,6 @@ public class RequestHandler implements Runnable {
             throw new IOException("file not found : " + path);
         }
         return sb.toString();
-    }
-
-    private void printHttpHeader(String line, BufferedReader br) throws IOException {
-        while ((line = br.readLine()) != null && !line.isEmpty()) { // 첫 번째 라인 (요청 라인) 은, 헤더가 아니기에 건너뛰고 시작한다.
-            int separator = line.indexOf(":");
-            if (separator != -1) {
-                String name = line.substring(0, separator).trim();
-                String value = line.substring(separator + 1).trim();
-                httpHeaders.put(name, value);
-            }
-        }
-
-        // Request Header 정돈해서 출력
-        for (Map.Entry<String, String> header : httpHeaders.entrySet()) {
-            logger.debug("Header Key: \"{}\" Value: \"{}\"", header.getKey(), header.getValue());
-        }
     }
 
     // 파일 확장자에 따라 적절한 Content-Type을 반환한다
@@ -138,7 +123,7 @@ public class RequestHandler implements Runnable {
         }
     }
 
-    // index.html 을 클라이언트에게 보낸다.
+    // register.html 을 클라이언트에게 보낸다.
     private void responseBody(DataOutputStream dos, byte[] body) {
         try {
             dos.write(body, 0, body.length);
