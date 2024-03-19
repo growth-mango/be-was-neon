@@ -48,7 +48,7 @@ public class RequestHandler implements Runnable {
     }
 
     private void processSignUp(HttpRequest httpRequest, HttpResponse httpResponse, DataOutputStream dos) {
-        User user = new User(httpRequest.getValue("userId"), httpRequest.getValue("nickName"), httpRequest.getValue("password"));
+        User user = new User(httpRequest.getValue("userid"), httpRequest.getValue("password"), httpRequest.getValue("nickname"));
         // 그리고 다시 register.html 로 돌아간다 -> 200 아니고 302 응답
         httpResponse.response302(dos);
         logger.debug("User : {}", user);
