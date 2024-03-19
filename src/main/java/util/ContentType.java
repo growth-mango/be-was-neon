@@ -18,13 +18,13 @@ public enum ContentType {
         this.mimeType = mimeType;
     }
 
-    public String getMimeType(){
+    public String getMimeType() {
         return mimeType;
     }
 
-    public static ContentType findByExtension(String extension){
-        for (ContentType type : values() ) {
-            if(type.extension.equals(extension)){
+    public static ContentType findByExtension(String extension) {
+        for (ContentType type : values()) {
+            if (type.extension.equals(extension)) {
                 return type;
             }
         }
