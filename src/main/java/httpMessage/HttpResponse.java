@@ -12,18 +12,21 @@ public class HttpResponse {
     private StringBuilder headers = new StringBuilder();
     private byte[] body;
     private static final Logger logger = LoggerFactory.getLogger(HttpResponse.class);
+
+    // ⭐HttpResponse 도 필요한 데이터 값을 가지는 클래스로 만들고 그것을 어디에서 생성할 지, 어디로 보낼 지는 여기에 의존하지 않도록 만드는게 중요하다.
     public HttpResponse(DataOutputStream dos) {
         this.dos = dos;
     }
 
-    public void addHeader(String name, String value) {
-        headers.append(name).append(": ").append(value).append("\r\n");
-    }
+//    public void addHeader(String name, String value) {
+//        headers.append(name).append(": ").append(value).append("\r\n");
+//    }
 
     public void setBody(byte[] body) {
         this.body = body;
     }
 
+    // 상태 코드도 따로 빼서 관리하면 더 좋을 듯 ... -> 우선 구현하고 생각하기
     public void response200Header(DataOutputStream dos, int lengthOfBodyContent, String contentType) {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
@@ -56,6 +59,4 @@ public class HttpResponse {
             logger.error(e.getMessage());
         }
     }
-
-
 }
