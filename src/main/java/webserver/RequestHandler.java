@@ -48,9 +48,15 @@ public class RequestHandler implements Runnable {
         }
     }
 
-    private void processSignUp(HttpRequest httpRequest, HttpResponse httpResponse, DataOutputStream dos) {
+    private void processSignUpPost(HttpRequest httpRequest, HttpResponse httpResponse, DataOutputStream dos) {
         User user = new User(httpRequest.getBody().getValue("userid"), httpRequest.getBody().getValue("password"), httpRequest.getBody().getValue("nickname"));
         // 그리고 다시 register.html 로 돌아간다 -> 200 아니고 302 응답
+        httpResponse.response302(dos);
+        logger.debug("User : {}", user);
+    }
+
+    private void processSignUpGet(HttpRequest httpRequest, HttpResponse httpResponse, DataOutputStream dos){
+        User user = new User(httpRequest.getRequestLine().getValue("userid"), httpRequest.getRequestLine().getValue("password"), httpRequest.getRequestLine().getValue("nickname"));
         httpResponse.response302(dos);
         logger.debug("User : {}", user);
     }
