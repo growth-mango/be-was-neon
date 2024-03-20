@@ -46,7 +46,7 @@ public class RequestHandler implements Runnable {
             if ("GET".equals(method)){ // 메서드에 따라 다르게 처리하기
                 processSignUpGet(httpRequest, httpResponse, dos);
             } else if ("POST".equals(method)) {
-                processSignUpGet(httpRequest, httpResponse, dos);
+                processSignUpPost(httpRequest, httpResponse, dos);
             }
 
         } else {

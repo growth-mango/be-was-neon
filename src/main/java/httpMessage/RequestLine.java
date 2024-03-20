@@ -20,6 +20,7 @@ public class RequestLine {
 
         if (hasQueryParameter(parts[1])) {
             this.uri = getUrlBeforeQueryParameter(parts[1]);
+            parseQueryParameter(parts[1]);
         } else {
             this.uri = parts[1]; // uri
         }
