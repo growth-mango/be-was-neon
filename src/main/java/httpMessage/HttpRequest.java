@@ -32,11 +32,6 @@ public class HttpRequest {
         }
     }
 
-
-    // ⭐내부 속성들을 전달해주는 getter를 가지는 경우라면 각각의 타입을 만들어 보는 것 고려해보기
-    // 예 : RequestLine, Headers, Body, Queires 등 등 클래스를 만들면 어떨까 고려해보기
-
-
     public RequestLine getRequestLine() {
         return requestLine;
     }
