@@ -28,7 +28,7 @@ public class RequestHandler implements Runnable {
             HttpRequest httpRequest = new HttpRequest(in);
             HttpResponse httpResponse = new HttpResponse(dos);
 
-            httpRequest.printHeaders(httpRequest.getHeaders());
+            httpRequest.getHeaders().printHeaders();
 
             processRequest(httpRequest, httpResponse, dos);
         } catch (IOException e) {
@@ -39,7 +39,8 @@ public class RequestHandler implements Runnable {
     // ⭐private 메서드들은 자신의 역할을 하는 클래스로 분리할 수 있음
     // 그럼 테스트할 가능성도 높아짐!
     private void processRequest(HttpRequest httpRequest, HttpResponse httpResponse, DataOutputStream dos) throws IOException {
-        String url = httpRequest.getRequestURL();
+//        String url = httpRequest.getRequestURL();
+        String url = httpRequest.getRequestLine().getUri();
         if (url.startsWith("/create")) { // 회원가입 /create?name=mango&password=1234&nickname=ffff ...
             processSignUp(httpRequest, httpResponse, dos); // user 에 보내고, 302 응답
         } else {
@@ -48,7 +49,7 @@ public class RequestHandler implements Runnable {
     }
 
     private void processSignUp(HttpRequest httpRequest, HttpResponse httpResponse, DataOutputStream dos) {
-        User user = new User(httpRequest.getValue("userid"), httpRequest.getValue("password"), httpRequest.getValue("nickname"));
+        User user = new User(httpRequest.getBody().getValue("userid"), httpRequest.getBody().getValue("password"), httpRequest.getBody().getValue("nickname"));
         // 그리고 다시 register.html 로 돌아간다 -> 200 아니고 302 응답
         httpResponse.response302(dos);
         logger.debug("User : {}", user);
