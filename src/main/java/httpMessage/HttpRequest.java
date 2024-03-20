@@ -15,7 +15,10 @@ import java.util.Map;
 public class HttpRequest {
     private String requestLine;
     private Map<String, String> headers = new HashMap<>();
-    private String body; // ⭐HttpBody는 Map 형식으로 하기 어려움 -> 텍스트와 바이너리 데이터 모두 저장할 수 있는 byte[] 이나 String 으로 수정 예정
+    private String body;// ⭐HttpBody는 Map 형식으로 하기 어려움 -> 텍스트와 바이너리 데이터 모두 저장할 수 있는 byte[] 이나 String 으로 수정 예정
+
+    /* */
+
     private Map<String, String> formData = new HashMap<>();
     private Map<String, String> queries = new HashMap<>(); // RequestLineParser composition
     private String requestURL; // RequestLineParser composition
@@ -32,10 +35,12 @@ public class HttpRequest {
         this.requestLine = br.readLine(); // 요청 라인
         readHeaders(br); // 헤더
 
+        // Content-Length 헤더 참고해서 본문 길이 얻기 -> 이를 이용해 본문 데이터 읽기
+        // Content-Length? 표현 데이터의 길이 (바이트단위) ex) 본문 hello, Content-Length : 5
         if (headers.containsKey("Content-Length")) {
-            int contentLength = Integer.parseInt(headers.get("Content-Length"));
+            int contentLength = Integer.parseInt(headers.get("Content-Length")); // 41, 44 ...
             char[] bodyChars = new char[contentLength];
-            br.read(bodyChars, 0, contentLength);
+            br.read(bodyChars, 0, contentLength); // 0부터 contentLength 까지 bodyChars 에 저장
             this.body = new String(bodyChars);
             parseFormData(this.body);
         }
