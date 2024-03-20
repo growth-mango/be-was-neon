@@ -1,22 +1,14 @@
 package httpMessage;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import util.RequestLineParser;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.HashMap;
-import java.util.Map;
-
 
 public class HttpRequest {
     private RequestLine requestLine;
     private Headers headers = new Headers();
     private Body body;
-//    private static final Logger logger = LoggerFactory.getLogger(HttpRequest.class);
 
     // ⭐HttpRequest 는 다른 클래스에서 받아 결과적으로 만들어지는 데이터 구조를 가지는 클래스
     // 그 다른 클래스가 어떤 클래스인지 생성할 때 결정하지 않아도 됨 -> HttpRequest 를 생성하기 위해 필요한 값만 받으면 생성할 수 있어야 함
