@@ -39,10 +39,16 @@ public class RequestHandler implements Runnable {
     // ⭐private 메서드들은 자신의 역할을 하는 클래스로 분리할 수 있음
     // 그럼 테스트할 가능성도 높아짐!
     private void processRequest(HttpRequest httpRequest, HttpResponse httpResponse, DataOutputStream dos) throws IOException {
-//        String url = httpRequest.getRequestURL();
+        String method = httpRequest.getRequestLine().getMethod();
         String url = httpRequest.getRequestLine().getUri();
+
         if (url.startsWith("/create")) { // 회원가입 /create?name=mango&password=1234&nickname=ffff ...
-            processSignUp(httpRequest, httpResponse, dos); // user 에 보내고, 302 응답
+            if ("GET".equals(method)){ // 메서드에 따라 다르게 처리하기
+                processSignUpGet(httpRequest, httpResponse, dos);
+            } else if ("POST".equals(method)) {
+                processSignUpGet(httpRequest, httpResponse, dos);
+            }
+
         } else {
             serveStaticResource(url, httpResponse, dos); // 그 외 static 리소스는 같은 방식으로 처리
         }
@@ -55,7 +61,7 @@ public class RequestHandler implements Runnable {
         logger.debug("User : {}", user);
     }
 
-    private void processSignUpGet(HttpRequest httpRequest, HttpResponse httpResponse, DataOutputStream dos){
+    private void processSignUpGet(HttpRequest httpRequest, HttpResponse httpResponse, DataOutputStream dos) {
         User user = new User(httpRequest.getRequestLine().getValue("userid"), httpRequest.getRequestLine().getValue("password"), httpRequest.getRequestLine().getValue("nickname"));
         httpResponse.response302(dos);
         logger.debug("User : {}", user);
