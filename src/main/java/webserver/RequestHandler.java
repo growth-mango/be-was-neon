@@ -75,6 +75,7 @@ public class RequestHandler implements Runnable {
         User user = new User(httpRequest.getBody().getValue("userid"), httpRequest.getBody().getValue("password"), httpRequest.getBody().getValue("nickname"));
         // 로그인 정보와 비교하기 위해 db에 저장하기
         Database.addUser(user);
+        logger.debug("Database : {}", Database.findAll());
         // 그리고 다시 register.html 로 돌아간다 -> 200 아니고 302 응답
         httpResponse.response302(dos);
         logger.debug("User : {}", user);
