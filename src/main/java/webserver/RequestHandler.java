@@ -55,7 +55,6 @@ public class RequestHandler implements Runnable {
         }
     }
 
-    // 회원가입 한 정보를 저장해야함
     private void processLogin(HttpRequest httpRequest, HttpResponse httpResponse, DataOutputStream dos) {
 
     }
@@ -77,7 +76,7 @@ public class RequestHandler implements Runnable {
     }
 
     private void serveStaticResource(String url, HttpResponse httpResponse, DataOutputStream dos) throws IOException {
-        // 모든 정적 리소스를 공통된 방식으로 처리 -> 경로 바꿈 : static/registration/index.html -> static/register.html
+        // 모든 정적 리소스를 공통된 방식으로 처리 -> 경로 바꿈 : static/registration/login.html -> static/register.html
         String filePath = DEFAULT_PATH + url;
         byte[] body = getHtml(filePath).getBytes();
         String contentType = getContentType(filePath);

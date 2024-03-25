@@ -8,10 +8,10 @@ import java.io.IOException;
 
 
 public class HttpResponse {
+    private static final Logger logger = LoggerFactory.getLogger(HttpResponse.class);
     private DataOutputStream dos;
     private Headers headers;
     private Body body;
-    private static final Logger logger = LoggerFactory.getLogger(HttpResponse.class);
 
     // ⭐HttpResponse 도 필요한 데이터 값을 가지는 클래스로 만들고 그것을 어디에서 생성할 지, 어디로 보낼 지는 여기에 의존하지 않도록 만드는게 중요하다.
     public HttpResponse(DataOutputStream dos) {
