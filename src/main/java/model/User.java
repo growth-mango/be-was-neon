@@ -15,8 +15,8 @@ public class User {
         return userId;
     }
 
-    public String getPassword() {
-        return password;
+    public String getPassword(String password) {
+        return this.password;
     }
 
     public String getNickName() {

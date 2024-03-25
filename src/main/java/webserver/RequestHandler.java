@@ -55,8 +55,20 @@ public class RequestHandler implements Runnable {
         }
     }
 
-    private void processLogin(HttpRequest httpRequest, HttpResponse httpResponse, DataOutputStream dos) {
+    private void verifyLogin(HttpRequest httpRequest, HttpResponse httpResponse, DataOutputStream dos) {
+        // 사용자가 로그인 폼에서 입력한 id와 password (post로 가정...)
+        String inputId = httpRequest.getBody().getValue("userid");
+        String inputPassword = httpRequest.getBody().getValue("password");
+        // db에서 사용자가 입력한 id 꺼내서 user에 저장하기
+        User user = Database.findUserById(inputId);
 
+        if (user == null) { // 사용자가 입력한 id의 유저가 db에 없거나
+            logger.debug("User Not Found");
+        } else if (!user.getPassword().equals(inputPassword)) { // db에 저장된 password가 사용자가 입력한 password와 다르거나
+            logger.debug("Password is incorrect");
+        } else { // 로그인 성공!
+            logger.debug("Login Successful!!");
+        }
     }
 
     private void processSignUpPost(HttpRequest httpRequest, HttpResponse httpResponse, DataOutputStream dos) {
