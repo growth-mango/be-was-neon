@@ -50,6 +50,13 @@ public class RequestHandler implements Runnable {
                 processSignUpPost(httpRequest, httpResponse, dos);
             }
 
+        } else if (url.startsWith("/login")) {
+            if ("POST".equals(method)) {
+                verifyLogin(httpRequest, httpResponse, dos);
+            } else {
+                serveStaticResource(url, httpResponse, dos);
+            }
+
         } else {
             serveStaticResource(url, httpResponse, dos); // 그 외 static 리소스는 같은 방식으로 처리
         }
@@ -68,6 +75,7 @@ public class RequestHandler implements Runnable {
             logger.debug("Password is incorrect");
         } else { // 로그인 성공!
             logger.debug("Login Successful!!");
+            httpResponse.response302WithSession(dos, "302302");
         }
     }
 
