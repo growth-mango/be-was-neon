@@ -6,6 +6,7 @@ import httpMessage.HttpResponse;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import session.SessionGenerator;
 import util.ContentType;
 
 import java.io.*;
@@ -75,7 +76,7 @@ public class RequestHandler implements Runnable {
             logger.debug("Password is incorrect");
         } else { // 로그인 성공!
             logger.debug("Login Successful!!");
-            httpResponse.response302WithSession(dos, "302302");
+            httpResponse.response302WithSession(dos, SessionGenerator.sessionId());
         }
     }
 

@@ -17,6 +17,10 @@ public class Database {
         return users.get(userId);
     }
 
+    public static User findUserBySession(String sessionId) {
+        return users.get(sessionId);
+    }
+
     public static Collection<User> findAll() {
         return users.values();
     }
