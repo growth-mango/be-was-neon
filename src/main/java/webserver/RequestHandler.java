@@ -1,14 +1,15 @@
 package webserver;
 
-import java.io.*;
-import java.net.Socket;
-
+import db.Database;
 import httpMessage.HttpRequest;
 import httpMessage.HttpResponse;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.ContentType;
+
+import java.io.*;
+import java.net.Socket;
 
 public class RequestHandler implements Runnable {
     private static final String DEFAULT_PATH = "./src/main/resources/static";
@@ -43,7 +44,7 @@ public class RequestHandler implements Runnable {
         String url = httpRequest.getRequestLine().getUri();
 
         if (url.startsWith("/create")) { // 회원가입 /create?name=mango&password=1234&nickname=ffff ...
-            if ("GET".equals(method)){ // 메서드에 따라 다르게 처리하기
+            if ("GET".equals(method)) { // 메서드에 따라 다르게 처리하기
                 processSignUpGet(httpRequest, httpResponse, dos);
             } else if ("POST".equals(method)) {
                 processSignUpPost(httpRequest, httpResponse, dos);
@@ -54,8 +55,15 @@ public class RequestHandler implements Runnable {
         }
     }
 
+    // 회원가입 한 정보를 저장해야함
+    private void processLogin(HttpRequest httpRequest, HttpResponse httpResponse, DataOutputStream dos) {
+
+    }
+
     private void processSignUpPost(HttpRequest httpRequest, HttpResponse httpResponse, DataOutputStream dos) {
         User user = new User(httpRequest.getBody().getValue("userid"), httpRequest.getBody().getValue("password"), httpRequest.getBody().getValue("nickname"));
+        // 로그인 정보와 비교하기 위해 db에 저장하기
+        Database.addUser(user);
         // 그리고 다시 register.html 로 돌아간다 -> 200 아니고 302 응답
         httpResponse.response302(dos);
         logger.debug("User : {}", user);
@@ -63,6 +71,7 @@ public class RequestHandler implements Runnable {
 
     private void processSignUpGet(HttpRequest httpRequest, HttpResponse httpResponse, DataOutputStream dos) {
         User user = new User(httpRequest.getRequestLine().getValue("userid"), httpRequest.getRequestLine().getValue("password"), httpRequest.getRequestLine().getValue("nickname"));
+        Database.addUser(user);
         httpResponse.response302(dos);
         logger.debug("User : {}", user);
     }
