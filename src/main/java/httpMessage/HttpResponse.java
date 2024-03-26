@@ -47,11 +47,23 @@ public class HttpResponse {
     }
 
     public void response302WithSession(DataOutputStream dos, String sessionId) {
-        String redirectURL = "/index.html";
+        String redirectURL = "/main/index.html";
         try {
             dos.writeBytes("HTTP/1.1 302 FOUND\r\n");
             dos.writeBytes("Location: " + redirectURL + "\r\n");
             dos.writeBytes("Set-Cookie: sid=" + sessionId + "; Path=/; \r\n");
+            dos.writeBytes("\r\n");
+            dos.flush();
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
+    }
+
+    public void response302failedLogin(DataOutputStream dos) {
+        String redirectURL = "/login_fail.html";
+        try {
+            dos.writeBytes("HTTP/1.1 302 FOUND\r\n");
+            dos.writeBytes("Location: " + redirectURL + "\r\n");
             dos.writeBytes("\r\n");
             dos.flush();
         } catch (IOException e) {

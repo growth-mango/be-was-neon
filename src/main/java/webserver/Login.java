@@ -22,10 +22,10 @@ public class Login {
 
         if (user == null) { // 사용자가 입력한 id의 유저가 db에 없거나
             logger.debug("User Not Found");
-            // 에러 페이지 리다이렉션 하기 (추가 예정)
+            httpResponse.response302failedLogin(dos);
         } else if (!user.getPassword().equals(inputPassword)) { // db에 저장된 password가 사용자가 입력한 password와 다르거나
             logger.debug("Password is incorrect");
-            // 에러 페이지 리다이렉션 하기 (추가 예정)
+            httpResponse.response302failedLogin(dos);
         } else { // 로그인 성공!
             logger.debug("Login Successful!!");
             String sessionId = SessionStore.createSession(user);
