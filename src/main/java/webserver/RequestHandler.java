@@ -6,7 +6,7 @@ import httpMessage.HttpResponse;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import session.SessionGenerator;
+import session.SessionStore;
 import util.ContentType;
 
 import java.io.*;
@@ -72,11 +72,14 @@ public class RequestHandler implements Runnable {
 
         if (user == null) { // 사용자가 입력한 id의 유저가 db에 없거나
             logger.debug("User Not Found");
+            // 에러 페이지 리다이렉션 하기 (추가 예정)
         } else if (!user.getPassword().equals(inputPassword)) { // db에 저장된 password가 사용자가 입력한 password와 다르거나
             logger.debug("Password is incorrect");
+            // 에러 페이지 리다이렉션 하기 (추가 예정)
         } else { // 로그인 성공!
             logger.debug("Login Successful!!");
-            httpResponse.response302WithSession(dos, SessionGenerator.sessionId());
+            String sessionId = SessionStore.createSession(user);
+            httpResponse.response302WithSession(dos, sessionId);
         }
     }
 

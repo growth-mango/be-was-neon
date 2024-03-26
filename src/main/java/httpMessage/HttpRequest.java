@@ -30,6 +30,7 @@ public class HttpRequest {
             br.read(bodyChars, 0, contentLength); // 0부터 contentLength 까지 bodyChars 에 저장
             this.body = new Body(new String(bodyChars));
         }
+
     }
 
     public RequestLine getRequestLine() {

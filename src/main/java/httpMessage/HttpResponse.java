@@ -51,7 +51,7 @@ public class HttpResponse {
         try {
             dos.writeBytes("HTTP/1.1 302 FOUND\r\n");
             dos.writeBytes("Location: " + redirectURL + "\r\n");
-            dos.writeBytes("Set-Cookie: sid=" + sessionId + "; Path=/; HttpOnly\r\n");
+            dos.writeBytes("Set-Cookie: sid=" + sessionId + "; Path=/; \r\n");
             dos.writeBytes("\r\n");
             dos.flush();
         } catch (IOException e) {

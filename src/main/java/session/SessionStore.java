@@ -17,4 +17,8 @@ public class SessionStore {
     public static User getUserBySessionId(String sessionId) {
         return sessions.get(sessionId);
     }
+
+    public static void removeSession(String sessionId) { // 로그아웃에 사용하기 위함
+        sessions.remove(sessionId);
+    }
 }

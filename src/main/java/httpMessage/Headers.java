@@ -1,11 +1,15 @@
 package httpMessage;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Headers {
+    private static final Logger logger = LoggerFactory.getLogger(Headers.class);
     private final Map<String, String> headers = new HashMap<>();
 
     public void add(String name, String value) {
@@ -38,6 +42,6 @@ public class Headers {
     }
 
     public void printHeaders() {
-        headers.forEach((key, value) -> System.out.println("Header Key: \"" + key + "\" Value: \"" + value + "\""));
+        headers.forEach((key, value) -> logger.info("Header Key: \"" + key + "\" Value: \"" + value + "\""));
     }
 }
