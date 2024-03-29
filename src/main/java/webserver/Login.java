@@ -29,7 +29,8 @@ public class Login {
         } else { // 로그인 성공!
             logger.debug("Login Successful!!");
             String sessionId = SessionStore.createSession(user);
-            httpResponse.response302WithSession(dos, sessionId);
+            httpResponse.addCookie("sid", sessionId);
+            httpResponse.response302(url);
         }
     }
 
