@@ -15,7 +15,7 @@ public class Login {
 
     public void verifyLogin(HttpRequest httpRequest, HttpResponse httpResponse, DataOutputStream dos) {
         // 사용자가 로그인 폼에서 입력한 id와 password (post로 가정...)
-        String inputId = httpRequest.getBody().getValue("userid");
+        String inputId = httpRequest.getBodyParam("userid");
         String inputPassword = httpRequest.getBody().getValue("password");
         // db에서 사용자가 입력한 id 꺼내서 user에 저장하기
         User user = Database.findUserById(inputId);
