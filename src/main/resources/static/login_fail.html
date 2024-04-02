@@ -3,13 +3,21 @@
 <head>
     <meta charset="UTF-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <link href="reset.css" rel="stylesheet"/>
-    <link href="global.css" rel="stylesheet"/>
+    <link href="../reset.css" rel="stylesheet"/>
+    <link href="../global.css" rel="stylesheet"/>
+    <style>
+        .error-message {
+            color: red; /* 빨간색으로 표시 */
+            font-size: 1rem; /* 폰트 크기 설정 */
+            margin-bottom: 24px; /* 메시지와 로그인 버튼 사이의 공간 */
+            text-align: center; /* 텍스트를 중앙 정렬 */
+        }
+    </style>
 </head>
 <body>
 <div class="container">
     <header class="header">
-        <a href="/static"><img src="img/signiture.svg"/></a>
+        <a href="/static"><img src="../img/signiture.svg"/></a>
         <ul class="header__menu">
             <li class="header__menu__item">
                 <a class="btn btn_contained btn_size_s" href="/login.html">로그인</a>
@@ -22,25 +30,15 @@
         </ul>
     </header>
     <div class="page">
-        <h2 class="page-title">회원가입</h2>
-        <form action="/create" class="form" id="registration-form" method="post">
-
+        <h2 class="page-title">로그인</h2>
+        <form action="/login" class="form" id="login-form" method="post">
             <div class="textfield textfield_size_s">
                 <p class="title_textfield">아이디</p>
                 <input
-                        autocomplete="username"
+                        autocomplete="user"
                         class="input_textfield"
                         name="userid"
                         placeholder="아이디를 입력해주세요"
-                />
-            </div>
-            <div class="textfield textfield_size_s">
-                <p class="title_textfield">닉네임</p>
-                <input
-                        autocomplete="username"
-                        class="input_textfield"
-                        name="nickname"
-                        placeholder="닉네임을 입력해주세요"
                 />
             </div>
             <div class="textfield textfield_size_s">
@@ -53,13 +51,14 @@
                         type="password"
                 />
             </div>
+            <p class="error-message">존재하지 않는 아이디 또는 비밀번호 입니다</p>
             <button
                     class="btn btn_contained btn_size_m"
-                    id="registration-btn"
+                    id="login-btn"
                     style="margin-top: 24px"
                     type="submit"
             >
-                회원가입
+                로그인
             </button>
         </form>
     </div>

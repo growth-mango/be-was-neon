@@ -8,10 +8,11 @@ import java.io.IOException;
 
 
 public class HttpResponse {
+    private static final Logger logger = LoggerFactory.getLogger(HttpResponse.class);
     private DataOutputStream dos;
     private Headers headers;
     private Body body;
-    private static final Logger logger = LoggerFactory.getLogger(HttpResponse.class);
+
 
     // ⭐HttpResponse 도 필요한 데이터 값을 가지는 클래스로 만들고 그것을 어디에서 생성할 지, 어디로 보낼 지는 여기에 의존하지 않도록 만드는게 중요하다.
     public HttpResponse(DataOutputStream dos) {
@@ -36,6 +37,31 @@ public class HttpResponse {
 
     public void response302(DataOutputStream dos) {
         String redirectURL = "/index.html";
+        try {
+            dos.writeBytes("HTTP/1.1 302 FOUND\r\n");
+            dos.writeBytes("Location: " + redirectURL + "\r\n");
+            dos.writeBytes("\r\n");
+            dos.flush();
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
+    }
+
+    public void response302WithSession(DataOutputStream dos, String sessionId) {
+        String redirectURL = "/main/index.html";
+        try {
+            dos.writeBytes("HTTP/1.1 302 FOUND\r\n");
+            dos.writeBytes("Location: " + redirectURL + "\r\n");
+            dos.writeBytes("Set-Cookie: sid=" + sessionId + "; Path=/; \r\n");
+            dos.writeBytes("\r\n");
+            dos.flush();
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
+    }
+
+    public void response302failedLogin(DataOutputStream dos) {
+        String redirectURL = "/login_fail.html";
         try {
             dos.writeBytes("HTTP/1.1 302 FOUND\r\n");
             dos.writeBytes("Location: " + redirectURL + "\r\n");
